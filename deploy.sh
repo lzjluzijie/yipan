@@ -18,9 +18,12 @@ go run yipan.go
 mv config yipan-config/config
 
 cd yipan-config
+rm -rf .git
+git init
 git add .
 git commit -m "Config updated by netlify: `date +"%Y%m%d-%H:%M:%S"` UTC+8"
-git push origin master
+git remote add origin $config
+git push origin master -f
 cd ..
 
 mkdir public
