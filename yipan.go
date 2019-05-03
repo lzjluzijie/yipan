@@ -118,7 +118,7 @@ func main() {
 	}
 
 	for _, file := range files {
-		_, err = redirects.WriteString(fmt.Sprintf("%s %s\r\n", strings.Replace(url.QueryEscape(file.Path), "%2F","/",-1), file.URL))
+		_, err = redirects.WriteString(fmt.Sprintf("%s %s\r\n", strings.Replace(url.PathEscape(file.Path), "%2F", "/", -1), file.URL))
 		if err != nil {
 			panic(err)
 		}
