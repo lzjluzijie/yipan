@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 export TZ='Asia/Shanghai'
-echo $sshkey > ~/.ssh/key
-export GIT_SSH_COMMAND="ssh -i ~/.ssh/key"
+echo $sshkey > ~/key
+export GIT_SSH_COMMAND="ssh -i ~/key"
 
 git config --global user.name yipan-config
 git clone git@github.com:lzjluzijie/yipan-config.git
