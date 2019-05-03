@@ -1,5 +1,7 @@
 # yipan
 
+Demo: https://p.halu.lu/
+
 ## 使用说明
 
 1. Fork 本仓库，再创建一个叫`yipan-config`的空仓库
@@ -87,7 +89,7 @@
 
 5. 生成新的ssh密钥对，将公钥添加至`yipan-config`的`deploy keys`，并给予push权限
 
-6. 在 Netlify 添加你fork的仓库，`Build command`为`bash deploy.sh`，`Publish directory`为`public`
+6. 在 Netlify 添加你fork的仓库，`Build command`为`bash deploy.sh`，`Publish directory`为`public`，记得将构建日志设为私有
 
 7. 添加三个环境变量
 
