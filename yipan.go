@@ -110,5 +110,15 @@ func main() {
 		log.Println(err.Error())
 	}
 
-	log.Println(files)
+	redirect, err := os.Create("_redirect")
+	if err != nil {
+		panic(err)
+	}
+
+	for _, file := range files {
+		_, err = redirect.WriteString(fmt.Sprintf("%s %s\r\n", file.Path, file.URL))
+		if err != nil {
+			panic(err)
+		}
+	}
 }

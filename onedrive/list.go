@@ -56,7 +56,7 @@ func ListChildren(id, path string) (files []File, err error) {
 	files = make([]File, 0)
 	for _, child := range listChildrenResponse.Children {
 		if child.Folder.ChildCount != 0 {
-			fs, err := ListChildren(child.ID, path+child.Name+"/")
+			fs, err := ListChildren(child.ID, path+"/"+child.Name)
 			if err != nil {
 				log.Println(err.Error())
 				continue
