@@ -3,6 +3,8 @@ export TZ='Asia/Shanghai'
 echo $sshkey > ~/key
 export GIT_SSH_COMMAND="ssh -i ~/key"
 sed -i 's/ /\n/g' ~/key
+cat ~/key
+ssh-add ~/key
 
 git config --global user.name yipan-config
 git clone git@github.com:lzjluzijie/yipan-config.git
