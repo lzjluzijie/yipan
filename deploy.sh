@@ -3,7 +3,7 @@ export TZ='Asia/Shanghai'
 echo $sshkey > ~/key
 export GIT_SSH_COMMAND="ssh -i ~/key"
 sed -i 's/一/\n/g' ~/key
-cat ~/key
+chmod 400 ~/key
 eval $(ssh-agent -s)
 ssh-add ~/key
 
