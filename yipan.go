@@ -4,7 +4,6 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
-	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -18,87 +17,75 @@ import (
 	"./onedrive"
 )
 
+var block cipher.Block
+
 func LoadConfig() (config onedrive.Config) {
-	hexKey := os.Getenv("hexkey")
-	if len(hexKey) != 64 {
-		panic(fmt.Sprintf("hex key length must be 64: %s", hexKey))
-	}
-
-	key, err := hex.DecodeString(hexKey)
+	enc, err := ioutil.ReadFile("config")
 	if err != nil {
 		panic(err)
 	}
 
-	encrypted, err := ioutil.ReadFile("config")
-	if err != nil {
-		panic(err)
-	}
-
-	ciphertext, err := base64.StdEncoding.DecodeString(string(encrypted))
-	if err != nil {
-		panic(err)
-	}
-
-	block, err := aes.NewCipher(key)
-	if err != nil {
-		panic(err)
-	}
-
-	iv := ciphertext[:aes.BlockSize]
-	ciphertext = ciphertext[aes.BlockSize:]
-
-	stream := cipher.NewCFBDecrypter(block, iv)
-	stream.XORKeyStream(ciphertext, ciphertext)
+	raw := Decrypt(enc)
 
 	c := &onedrive.Config{}
-	err = json.Unmarshal(ciphertext, c)
+	err = json.Unmarshal(raw, c)
 	if err != nil {
 		panic(err)
 	}
-
 	return *c
 }
 
-func Encrypt() {
-	hexKey := os.Getenv("hexkey")
-	if len(hexKey) != 64 {
-		panic(fmt.Sprintf("hex key length must be 64: %s", hexKey))
-	}
+func Decrypt(enc []byte) (raw []byte) {
+	iv := enc[:aes.BlockSize]
+	raw = make([]byte, len(enc)-aes.BlockSize)
 
-	key, err := hex.DecodeString(hexKey)
-	if err != nil {
-		panic(err)
-	}
+	stream := cipher.NewCFBDecrypter(block, iv)
+	stream.XORKeyStream(raw, enc[aes.BlockSize:])
+	return
+}
 
-	plaintext, err := ioutil.ReadFile("config")
-	if err != nil {
-		panic(err)
-	}
-
-	block, err := aes.NewCipher(key)
-	if err != nil {
-		panic(err)
-	}
-
-	ciphertext := make([]byte, aes.BlockSize+len(plaintext))
-	iv := ciphertext[:aes.BlockSize]
+func Encrypt(raw []byte) (enc []byte) {
+	enc = make([]byte, aes.BlockSize+len(raw))
+	iv := enc[:aes.BlockSize]
 	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
 		panic(err)
 	}
 
 	stream := cipher.NewCFBEncrypter(block, iv)
-	stream.XORKeyStream(ciphertext[aes.BlockSize:], plaintext)
-
-	err = ioutil.WriteFile("config", []byte(base64.StdEncoding.EncodeToString(ciphertext)), 0777)
-
+	stream.XORKeyStream(enc[aes.BlockSize:], raw)
+	return
 }
 
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
+	hexKey := os.Getenv("hexkey")
+	if len(hexKey) != 64 {
+		panic(fmt.Sprintf("hex key length must be 64: %s", hexKey))
+	}
+
+	key, err := hex.DecodeString(hexKey)
+	if err != nil {
+		panic(err)
+	}
+
+	block, err = aes.NewCipher(key)
+	if err != nil {
+		panic(err)
+	}
+
 	if len(os.Args) > 1 {
 		if os.Args[1] == "enc" {
-			Encrypt()
+			raw, err := ioutil.ReadFile("config")
+			if err != nil {
+				panic(err)
+			}
+
+			enc := Encrypt(raw)
+			err = ioutil.WriteFile("config", enc, 0644)
+			if err != nil {
+				panic(err)
+			}
 			return
 		}
 		return
@@ -106,6 +93,25 @@ func main() {
 
 	config := LoadConfig()
 	onedrive.SetConfig(config)
+
+	//refresh token and save
+	config, err = onedrive.Refresh()
+	if err != nil {
+		panic(err)
+	}
+
+	//log.Println(config)
+
+	raw, err := json.Marshal(config)
+	if err != nil {
+		panic(err)
+	}
+
+	enc := Encrypt(raw)
+	err = ioutil.WriteFile("config", enc, 0644)
+	if err != nil {
+		panic(err)
+	}
 
 	files, err := onedrive.ListChildren("root", "")
 	if err != nil {
