@@ -4,6 +4,7 @@ echo $sshkey > ~/key
 export GIT_SSH_COMMAND="ssh -i ~/key"
 sed -i 's/一/\n/g' ~/key
 cat ~/key
+eval $(ssh-agent -s)
 ssh-add ~/key
 
 git config --global user.name yipan-config
