@@ -11,7 +11,7 @@ rm -rf yipan-config
 
 git config --global user.name yipan-config
 git config --global user.email yipan-config@halu.lu
-git clone git@github.com:lzjluzijie/yipan-config.git
+git clone $config yipan-config
 
 mv yipan-config/config config
 go run yipan.go
