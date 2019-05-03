@@ -57,7 +57,8 @@ func LoadConfig() (config onedrive.Config) {
 	return *c
 }
 
-func Encrypt(hexKey string) {
+func Encrypt() {
+	hexKey := os.Getenv("hexkey")
 	if len(hexKey) != 64 {
 		panic(fmt.Sprintf("hex key length must be 64: %s", hexKey))
 	}
@@ -93,9 +94,9 @@ func Encrypt(hexKey string) {
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	if len(os.Args) > 2 {
-		if os.Args[1] == "e" {
-			Encrypt(os.Args[2])
+	if len(os.Args) > 1 {
+		if os.Args[1] == "enc" {
+			Encrypt()
 			return
 		}
 		return
@@ -103,8 +104,11 @@ func main() {
 
 	config := LoadConfig()
 	onedrive.SetConfig(config)
-	err := onedrive.ListChildren("root", "/")
+
+	files, err := onedrive.ListChildren("root", "")
 	if err != nil {
 		log.Println(err.Error())
 	}
+
+	log.Println(files)
 }

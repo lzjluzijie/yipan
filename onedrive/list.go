@@ -17,16 +17,21 @@ type File struct {
 }
 
 type Child struct {
-	ID   string
-	Name string
-	Size int64
+	ID     string
+	Name   string
+	Size   int64
+	Folder Folder
+}
+
+type Folder struct {
+	ChildCount int
 }
 
 type ListChildrenResponse struct {
 	Children []Child `json:"value"`
 }
 
-func ListChildren(id, path string) (err error) {
+func ListChildren(id, path string) (files []File, err error) {
 	req, err := NewRequest("GET", fmt.Sprintf("https://graph.microsoft.com/v1.0/me/drive/items/%s/children", id), nil)
 	if err != nil {
 		return
@@ -48,6 +53,31 @@ func ListChildren(id, path string) (err error) {
 		return
 	}
 
-	log.Println(listChildrenResponse)
+	files = make([]File, 0)
+	for _, child := range listChildrenResponse.Children {
+		if child.Folder.ChildCount != 0 {
+			fs, err := ListChildren(child.ID, path+child.Name+"/")
+			if err != nil {
+				log.Println(err.Error())
+				continue
+			}
+
+			files = append(files, fs...)
+		} else {
+			url, err := Share(child.ID)
+			if err != nil {
+				log.Println(err.Error())
+				continue
+			}
+
+			files = append(files, File{
+				ID:   child.ID,
+				Name: child.Name,
+				Path: path + "/" + child.Name,
+				Size: child.Size,
+				URL:  url,
+			})
+		}
+	}
 	return
 }
