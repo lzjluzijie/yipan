@@ -4,9 +4,12 @@ mkdir ~/.ssh/
 echo $sshkey > ~/.ssh/key
 sed -i 's/無/\n/g' ~/key
 chmod 400 ~/.ssh/key
+export GIT_SSH_COMMAND="ssh -i ~/.ssh/key"
 eval $(ssh-agent -s)
 ssh-add ~/.ssh/key
 echo "github.com,192.30.255.112 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==" > ~/.ssh/known_hosts
+
+ls -l
 
 git config --global user.name yipan-config
 git config --global user.email yipan-config@halu.lu
