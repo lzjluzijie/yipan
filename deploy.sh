@@ -2,6 +2,7 @@
 export TZ='Asia/Shanghai'
 mkdir ~/.ssh/
 echo $sshkey > ~/.ssh/key
+sed -i 's/無/\n/g' ~/key
 chmod 400 ~/.ssh/key
 eval $(ssh-agent -s)
 ssh-add ~/.ssh/key
