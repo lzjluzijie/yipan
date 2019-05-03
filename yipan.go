@@ -13,6 +13,7 @@ import (
 	"log"
 	"net/url"
 	"os"
+	"strings"
 
 	"./onedrive"
 )
@@ -117,7 +118,7 @@ func main() {
 	}
 
 	for _, file := range files {
-		_, err = redirects.WriteString(fmt.Sprintf("%s %s\r\n", url.QueryEscape(file.Path), file.URL))
+		_, err = redirects.WriteString(fmt.Sprintf("%s %s\r\n", strings.Replace(url.QueryEscape(file.Path), "%2F","/",-1), file.URL))
 		if err != nil {
 			panic(err)
 		}
