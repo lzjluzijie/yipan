@@ -2,4 +2,4 @@
 
 go run yipan.go
 mkdir public
-mv _redirect public
+mv _redirects public

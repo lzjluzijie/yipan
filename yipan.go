@@ -11,9 +11,10 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"net/url"
 	"os"
 
-	"github.com/lzjluzijie/yipan/onedrive"
+	"./onedrive"
 )
 
 func LoadConfig() (config onedrive.Config) {
@@ -110,13 +111,13 @@ func main() {
 		log.Println(err.Error())
 	}
 
-	redirect, err := os.Create("_redirect")
+	redirects, err := os.Create("_redirects")
 	if err != nil {
 		panic(err)
 	}
 
 	for _, file := range files {
-		_, err = redirect.WriteString(fmt.Sprintf("%s %s\r\n", file.Path, file.URL))
+		_, err = redirects.WriteString(fmt.Sprintf("%s %s\r\n", url.QueryEscape(file.Path), file.URL))
 		if err != nil {
 			panic(err)
 		}
