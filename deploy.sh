@@ -26,5 +26,9 @@ git remote add origin $config
 git push origin master -f
 cd ..
 
-mkdir public
+sudo yarn install
+yarn run build
+mv dist public
+
+echo "/*   /index.html   200" >> _redirects
 mv _redirects public
